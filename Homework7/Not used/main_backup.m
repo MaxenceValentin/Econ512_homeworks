@@ -13,7 +13,7 @@ l = 15; % cap of know-how
 v = 10; % value of good
 delta = 0.03; % depreciation 
 beta = 1/1.05; % discounting parameter
-eps = 1e-5; % convergence critirion
+eps = 1e-4; % convergence critirion
 lambda = 0.8; %Dampening parameters
 eta = log(rho)/log(2);
 
@@ -30,7 +30,7 @@ c(l:L) = kappa*l^eta;
 
 % Initial value
 P = ones(L,L)*8;
-V = (P - c)/0.1; % Start by discounting current profit by 10%
+V = (-1)*(P - c)/0.1; % Start by discounting current profit by 10%
 
 p_new = zeros(L,L);
 V_new = zeros(L,L);
@@ -52,12 +52,12 @@ for om1 = 1:L
         
         W_state =  reshape(W(om1,om2,:),[1,3]);      
         f = @(p1) (-1)*val_backup(p1,p2,W_state,om1);
-        %q = @(p1) (-1)*foc_indv(p1,p2,W_state,om1);
+        %q = @(p1) foc_indv(p1,p2,W_state,om1);
         p_new(om1,om2) = fminsearch(f,p1); 
         %[p_new2(om1,om2) , V_new2(om1,om2)] = fsolve(q,p1,options); 
 
         V_new(om1,om2) = f(p_new(om1,om2));
-        %V_new2(om1,om2) = f(p_new2(om1,om2));
+        
     end
 
 end
@@ -72,11 +72,9 @@ end
 end
 
 Policy = P;
-Profit = P - c;
 Value = (-1)*V;
 
 surf(Policy);
-surf(Profit);
 surf(Value);
 
 %% 
@@ -92,7 +90,7 @@ end
 
 
 for j = 1:i
-    hist3(states(:,:,j),{0:2:30 0:2:30})
+    hist3(states(:,:,j),{0:1:30 0:1:30})
     xlabel('Omega 2')
     ylabel('Omega 1')
     title('Distribution of states after t =')
@@ -100,4 +98,4 @@ for j = 1:i
     pause(0.5)
 end
 
-
+save('distribution.mat','states')

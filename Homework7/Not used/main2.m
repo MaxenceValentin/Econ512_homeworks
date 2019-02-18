@@ -25,6 +25,8 @@ c = zeros(L,1);
 c(1:(l-1)) = kappa*omega(1:(l-1)).^eta; 
 c(l:L) = kappa*l^eta;
 
+c_vec = repmat(c,30,1);
+
 
 %%
 
@@ -38,36 +40,27 @@ V_new = zeros(L,L);
 iter = 0;
 check = 1;
 iter = 0;
+options = optimset('TolX', 1e-12, 'TolFun', 1e-12);
+
 while check > eps
 
-    W = getW(V);   
+    W = getW(V);  
+    P2 = P';  
+       
+    f = @(P) (-1)*val(P,P2,W);
+    p_new = fminsearch(f,P);   
+    V_new = val(p_new,P2,W);
     
-for om1 = 1:L
     
-    for om2 = 1:L
-        
-        p1 = P(om1,om2);
-        p2 = P(om2,om1);
-        
-        W_state =  reshape(W(om1,om2,:),[1,3]);      
-        f = @(p1) (-1)*val(p1,p2,W_state,om1);
-
-        p_new(om1,om2) = fminsearch(f,p1); 
-        
-        V_new(om1,om2) = f(p_new(om1,om2));
-    end
-
-end
     iter = iter +1;
-    if iter > 500
+    if iter > 100
         break
     end
-    check = max( max(max(abs((V_new - V)./(1+abs(V_new))))),  max(max(abs((p_new-P)./(1+abs(p_new))))));
+    check = max( max(max(abs((V_new - V)./(1+abs(V_new))))),  max(max(abs((p_new-P)./(1+abs(p_new))))))
     V = lambda * V_new + (1-lambda)*V;
     P = lambda * p_new + (1-lambda)*P;
 
 end
-
 
 
 

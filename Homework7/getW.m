@@ -7,7 +7,7 @@ W = zeros(L,L,3);
 
 
 for om1 = 1:L
-    for om2 = 1:L
+for om2 = 1:L
 
 W0 = 0;
 W1 = 0;
